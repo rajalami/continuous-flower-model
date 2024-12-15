@@ -1,0 +1,29 @@
+services:
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    hostname: azurite
+    restart: always
+    command: "azurite --blobHost 0.0.0.0 --blobPort 10000 --queueHost 0.0.0.0 --queuePort 10001"
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      # - "10002:10002"
+    networks:
+      - olearn
+
+  # One-time data population
+  populate:
+    image: kamk/azurite-populate
+    env_file:
+      - .env
+    build:
+      context: ./src/azurite_populate
+      dockerfile: Dockerfile
+    networks:
+      - olearn
+    depends_on:
+      - azurite
+
+networks:
+  olearn:
+    
