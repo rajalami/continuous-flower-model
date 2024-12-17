@@ -24,6 +24,22 @@ services:
     depends_on:
       - azurite
 
+  frontend:
+    image: kamk/frontend
+    env_file:
+      - .env
+    hostname: drawhello
+    build:
+      context: ./src/drawhello
+      dockerfile: Dockerfile
+    ports:
+      - "8000:80"
+    networks:
+      - olearn
+    depends_on:
+      populate:
+        condition: service_completed_successfully
+
 networks:
   olearn:
     
