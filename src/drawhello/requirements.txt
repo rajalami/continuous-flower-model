@@ -1,6 +1,0 @@
-azure-storage-blob
-azure-storage-queue
-python-dotenv
-streamlit
-streamlit_drawable_canvas
-requests

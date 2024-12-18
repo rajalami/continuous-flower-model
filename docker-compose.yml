@@ -24,18 +24,35 @@ services:
     depends_on:
       - azurite
 
+  # Frontend with streamlit app
   frontend:
-    image: kamk/frontend
+    image: kamk/flowerui
     env_file:
       - .env
-    hostname: drawhello
+    hostname: flowerui
     build:
-      context: ./src/drawhello
+      context: ./src/flowerui
       dockerfile: Dockerfile
     ports:
       - "8000:80"
     networks:
       - olearn
+    depends_on:
+      populate:
+        condition: service_completed_successfully
+
+  prediction:
+    image: kamk/predictflower
+    env_file:
+      - .env
+    hostname: predictflower
+    build:
+      context: ./src/predictflower
+      dockerfile: Dockerfile
+    ports:
+      - "8888:8888"
+    networks:
+        - olearn
     depends_on:
       populate:
         condition: service_completed_successfully

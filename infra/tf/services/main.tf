@@ -30,21 +30,21 @@ resource "azurerm_storage_queue" "olearn" {
 
 # TODO: Upload the base model
 resource "azurerm_storage_blob" "model" {
-  name                   = "models/model_1713867925.joblib"
+  name                   = "models/flowersmodel_1234567890.keras"
   storage_account_name   = azurerm_storage_account.olearn.name
   storage_container_name = azurerm_storage_container.olearn.name
   type                   = "Block"
-  source                 = "../../../src/azurite_populate/model_1713867925.joblib"
+  source                 = "../../../src/azurite_populate/flowersmodel_1234567890.keras"
 }
 
-# TODO: Upload the base model
-resource "azurerm_storage_blob" "dataset" {
-  name                   = "datasets/dataset.csv"
-  storage_account_name   = azurerm_storage_account.olearn.name
-  storage_container_name = azurerm_storage_container.olearn.name
-  type                   = "Block"
-  source                 = "../../../src/azurite_populate/dataset.csv"
-}
+ # TODO: Upload the base model
+ resource "azurerm_storage_blob" "dataset" {
+   name                   = "datasets/dataset.csv"
+   storage_account_name   = azurerm_storage_account.olearn.name
+   storage_container_name = azurerm_storage_container.olearn.name
+   type                   = "Block"
+   source                 = "../../../src/azurite_populate/dataset.csv"
+ }
 
 resource "azurerm_container_group" "olearn" {
   name                        = "ci-${var.identifier}-${var.course_short_name}"
@@ -64,7 +64,7 @@ resource "azurerm_container_group" "olearn" {
   }
 
   container {
-    name   = "drawhello"
+    name   = "flowerui"
     image  = var.frontend_image
     cpu    = "1.0"
     memory = "1.0"
@@ -80,7 +80,7 @@ resource "azurerm_container_group" "olearn" {
       STORAGE_QUEUE_URL    = azurerm_storage_account.olearn.primary_queue_endpoint
       STORAGE_CONTAINER    = azurerm_storage_container.olearn.name
       STORAGE_QUEUE        = azurerm_storage_queue.olearn.name
-      PREDICT_HELLO_URL    = "http://localhost:8888/predict"
+      PREDICT_FLOWER_URL    = "http://localhost:8888/predict"
     }
 
     # This is only needed if NOT using DefaultAzureCredential (SystemAssigned Identity)
@@ -89,30 +89,30 @@ resource "azurerm_container_group" "olearn" {
     }
   }
 
-  # container {
-  #   name   = "predicthello"
-  #   image  = var.backend_image
-  #   cpu    = "1.0"
-  #   memory = "1.0"
-  #   ports {
-  #     port     = 8888
-  #     protocol = "TCP"
-  #   }
+  container {
+    name   = "predictflower"
+    image  = var.backend_image
+    cpu    = "1.0"
+    memory = "1.0"
+    ports {
+      port     = 8888
+      protocol = "TCP"
+    }
 
-  #   environment_variables = {
-  #     USE_AZURE_CREDENTIAL = var.use_azure_credential
-  #     STORAGE_ACCOUNT_NAME = azurerm_storage_account.olearn.name
-  #     STORAGE_BLOB_URL     = azurerm_storage_account.olearn.primary_blob_endpoint
-  #     STORAGE_QUEUE_URL    = azurerm_storage_account.olearn.primary_queue_endpoint
-  #     STORAGE_CONTAINER    = azurerm_storage_container.olearn.name
-  #     STORAGE_QUEUE        = azurerm_storage_queue.olearn.name
-  #   }
+    environment_variables = {
+      USE_AZURE_CREDENTIAL = var.use_azure_credential
+      STORAGE_ACCOUNT_NAME = azurerm_storage_account.olearn.name
+      STORAGE_BLOB_URL     = azurerm_storage_account.olearn.primary_blob_endpoint
+      STORAGE_QUEUE_URL    = azurerm_storage_account.olearn.primary_queue_endpoint
+      STORAGE_CONTAINER    = azurerm_storage_container.olearn.name
+      STORAGE_QUEUE        = azurerm_storage_queue.olearn.name
+    }
 
-  #   # This is only needed if NOT using DefaultAzureCredential (SystemAssigned Identity)
-  #   secure_environment_variables = {
-  #     STORAGE_CONNECTION_STRING = var.use_azure_credential ? "" : azurerm_storage_account.olearn.primary_connection_string
-  #   }
-  # }
+    # This is only needed if NOT using DefaultAzureCredential (SystemAssigned Identity)
+    secure_environment_variables = {
+      STORAGE_CONNECTION_STRING = var.use_azure_credential ? "" : azurerm_storage_account.olearn.primary_connection_string
+    }
+  }
 
   # container {
   #   name   = "modeller"

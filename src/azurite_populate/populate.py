@@ -68,9 +68,13 @@ if __name__ == "__main__":
             print(f"Queue {STORAGE_QUEUE} created.") 
 
     # Upload following files to the storage container
+    # files = [
+    #     ("models/", "model_1713867925.joblib"),
+    #     ("datasets/", "dataset.csv"),
+    # ]
+
     files = [
-        ("models/", "model_1713867925.joblib"),
-        ("datasets/", "dataset.csv"),
+        ("models/", "flowersmodel_1234567890.keras")
     ]
 
     with get_blob_service_client() as blob_service_client:

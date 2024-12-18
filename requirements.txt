@@ -4,3 +4,4 @@ python-dotenv
 streamlit
 streamlit_drawable_canvas
 requests
+python-multipart
