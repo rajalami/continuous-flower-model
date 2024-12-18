@@ -33,13 +33,13 @@ variable "default_tags" {
 variable "frontend_image" {
   type        = string
   description = "The image to use for the frontend container (The Draw Hello Streamlit UI)."
-  default     = "crmikkoolearn.azurecr.io/drawhello:1.0" # cropeolearn.azurecr.io/drawhello:1.0
+  default     = "crmikkoolearn.azurecr.io/flowerui:1.0" # cropeolearn.azurecr.io/drawhello:1.0
 }
 
 variable "backend_image" {
   type        = string
   description = "The image to use for the backend container (The Predict Hello Fast API)"
-  default     = "crmikkoolearn.azurecr.io/predicthello:1.0" # cropeolearn.azurecr.io/predicthello:1.0
+  default     = "crmikkoolearn.azurecr.io/predictflower:1.0" # cropeolearn.azurecr.io/predicthello:1.0
 
 }
 

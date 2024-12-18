@@ -55,6 +55,7 @@ def get_blob_service_client():
 def latest_model_version() -> int:
     """
     returns the value of latest saved model from blob storage
+    used to load newest model for prediction.
     """
     with get_blob_service_client() as blob_service_client:
         container_client = blob_service_client.get_container_client(os.environ["STORAGE_CONTAINER"])
@@ -63,32 +64,29 @@ def latest_model_version() -> int:
         latest = max([int(x.name.split("_")[1].split(".")[0]) for x in blobs])
 
         unix_to_iso = datetime.fromtimestamp(latest).isoformat()
-        logging.info(f"latest_model_version() seeing: {latest} created at {unix_to_iso}")
+        logging.info(f"Latest_model_version() seeing: {latest} created at {unix_to_iso}")
         return latest
 
 @lru_cache(maxsize=5)
 def load_model(version:int):
     # Find the latest model from /models folder in the storage container
-    # The model name follows the pattern model_{unix_seconds}.joblib 
+    # The model name follows the pattern model_{unix_seconds}.keras
     with get_blob_service_client() as blob_service_client:
         container_client = blob_service_client.get_container_client(os.environ["STORAGE_CONTAINER"])
-        blob_client = container_client.get_blob_client(f"models/flowermodel_{version}.keras") ## .joblib to keras.
+        blob_client = container_client.get_blob_client(f"models/flowersmodel_{version}.keras") 
         logging.info(f"Loading model version {version}.")
         logging.info(f"type {type(blob_client)}.")
         
-        with BytesIO() as data:
-            logging.info(f"1")
-            logging.info(f"{data}")
-            blob_client.download_blob().readinto(data)
-            logging.info(f"{data}")
-            logging.info(f"2")
-            return joblib.load(data)
+        # with BytesIO() as data:
+        #     logging.info(f"1")
+        #     logging.info(f"{data}")
+        #     blob_client.download_blob().readinto(data)
+        #     logging.info(f"{data}")
+        #     logging.info(f"2")
+        #     return joblib.load(data)
 
-
-
-        # blob_data = blob_client.download_blob()
-
-        # file_bytes = blob_data.readall()
-        # logging.info(f"Downloaded model size: {len(file_bytes)} bytes.")
-        # logging.info(f"type {type(file_bytes)}.")
-        # return file_bytes
+        blob_data = blob_client.download_blob()
+        file_bytes = blob_data.readall()
+        logging.info(f"Downloaded model size: {len(file_bytes)} bytes.")
+        logging.info(f"type {type(file_bytes)}.")
+        return file_bytes

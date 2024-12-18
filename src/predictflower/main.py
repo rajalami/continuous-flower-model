@@ -40,7 +40,7 @@ def predict_hello(image_file:   UploadFile = File(...)) -> Prediction:
     latest_version = latest_model_version()
     logging.info(latest_version)
     model_bytes = load_model(latest_version) 
-    logging.info("did it work? NO")
+    logging.info("did it work? Yes")
     
     #bytes into path, wont be deleting temp file.
     with tempfile.NamedTemporaryFile(delete=False, suffix=".keras") as temp_file:
@@ -52,26 +52,24 @@ def predict_hello(image_file:   UploadFile = File(...)) -> Prediction:
     logging.info(f"model: {model.summary(show_trainable=True)}")
 
     image_bytes = image_file.file.read()
-    logging.info(f"image_bytes read{image_bytes}")
     test_image = image.load_img(BytesIO(image_bytes))
-    logging.info(f"image_bytes read{image_bytes}")
     test_image = format_image(test_image)
 
     output = model.predict(tf.expand_dims(test_image, axis=0), batch_size=1)
+    logging.info(output)
 
-    predicted_class = tf.argmax(output, axis=1).numpy()[0]  # Get the index of the highest probability
-    logging.info(f"Index of predicted class: {predicted_class}")
+    output = tf.nn.softmax(output)
+    logging.info(f"Output: {output}")
+    output_index = tf.argmax(output, axis=1)
+    confidence = float(output[0][int(output_index)])
+    logging.info(f"Confidence: {confidence}")
     flower_list = ["dandelion", "daisy", "tulips", "sunflowers", "roses"]
-    prediction = flower_list[predicted_class]
-    logging.info(f"Predicted class label: {prediction}")
-    confidence_score = tf.reduce_max(tf.nn.softmax(output)).numpy()[0]  # Get the confidence score
-    logging.info(f"Confidence_score: {confidence_score}")
-
-    # logging.info(f"Prediction: {predicted_class}")
+    prediction = flower_list[int(output_index)]
+    logging.info(f"Prediction: {prediction}")
 
     return Prediction(
-        label=predicted_class,
-        confidence=confidence_score,
+        label=output_index,
+        confidence=confidence,
         prediction=prediction,
         version=latest_version,
         version_iso=datetime.fromtimestamp(latest_version).isoformat()
