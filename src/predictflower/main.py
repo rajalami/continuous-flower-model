@@ -56,10 +56,10 @@ def predict_hello(image_file:   UploadFile = File(...)) -> Prediction:
     test_image = format_image(test_image)
 
     output = model.predict(tf.expand_dims(test_image, axis=0), batch_size=1)
-    logging.info(output)
+    #logging.info(output)
 
     output = tf.nn.softmax(output)
-    logging.info(f"Output: {output}")
+    #logging.info(f"Output: {output}")
     output_index = tf.argmax(output, axis=1)
     confidence = float(output[0][int(output_index)])
     logging.info(f"Confidence: {confidence}")

@@ -117,8 +117,8 @@ resource "azurerm_container_group" "olearn" {
   container {
     name   = "modeller"
     image  = var.modeller_image
-    cpu    = "3.0"
-    memory = "8.0"
+    cpu    = "2.0"
+    memory = "6.0"
 
     environment_variables = {
       USE_AZURE_CREDENTIAL = var.use_azure_credential

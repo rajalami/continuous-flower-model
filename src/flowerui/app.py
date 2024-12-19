@@ -83,8 +83,8 @@ image_file = st.file_uploader("Upload picture for prediction (.JPEG files only)"
 
 # Ask user to predict the image using REST API backend model
 if image_file is not None: # if image_file is not None:
-    logging.info(f"Loaded image_file type1: {type(image_file)}")
-    logging.info(f"Loaded image_file name: {image_file.name}")
+    #logging.info(f"Loaded image_file type1: {type(image_file)}")
+    #logging.info(f"Loaded image_file name: {image_file.name}")
 
     st.image(image_file, "Uploaded image")
 
@@ -93,7 +93,7 @@ if image_file is not None: # if image_file is not None:
         predict_json = call_predict(image_file)
 
     st.write("Not happy with the prediction? Submit the drawing with a label so that we can improve the model.")
-    logging.info(f"image_file type2: {type(image_file)}")
+    #logging.info(f"image_file type2: {type(image_file)}")
 
     flower_list = ["dandelion", "daisy", "tulips", "sunflowers", "roses"]
     label = st.selectbox("Label:", flower_list, placeholder="Select correct label")
@@ -119,9 +119,9 @@ if image_file is not None: # if image_file is not None:
         with get_queue_service_client() as queue_service_client:
             # upload queue client.
             with queue_service_client.get_queue_client(os.environ["STORAGE_QUEUE"]) as queue_client:
-                logging.info(f"image_file type3: {type(image_file)}")
-                logging.info(f"flower_index type: {type(flower_index)}")
-                logging.info(f"flower_index: {flower_index}")
+                #logging.info(f"image_file type3: {type(image_file)}")
+                #logging.info(f"flower_index type: {type(flower_index)}")
+                #logging.info(f"flower_index: {flower_index}")
 
                 # message in .json format.
                 message = {
@@ -132,8 +132,8 @@ if image_file is not None: # if image_file is not None:
                 queue_client.send_message(json.dumps(message)) # sends image_name and flower label into queue as a message
                 json_dump = json.dumps(message)
 
-                logging.info(json_dump)
-                logging.info(message)
+                #logging.info(json_dump)
+                #logging.info(message)
                 logging.info(f"Message ({image_name}) as ({label}) sent to Queue ({os.environ['STORAGE_QUEUE']})")
 
                 st.write(f"Sent: {image_name} as label {flower_list[flower_index]} to model training ({os.environ['STORAGE_QUEUE']}).")

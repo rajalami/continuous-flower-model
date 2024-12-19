@@ -78,8 +78,8 @@ def get_all_from_queue(): #-> list[tuple[image, int]]:
             message_content = json.loads(msg.content)
             image_name = message_content.get("image_name")
             label = message_content.get("label")
-            logging.info(f"image_name: {image_name}")
-            logging.info(f"label: {label}")
+            #logging.info(f"image_name: {image_name}")
+            #logging.info(f"label: {label}")
             
             # load images from blob storage.
             with get_blob_service_client() as blob_service_client:
@@ -88,12 +88,12 @@ def get_all_from_queue(): #-> list[tuple[image, int]]:
                 
                 blob_data = blob_client.download_blob()
                 bytes = blob_data.readall()
-                logging.info(f"Bytes length: {len(bytes)}")
+                #logging.info(f"Bytes length: {len(bytes)}")
                 image = keras.preprocessing.image.load_img(BytesIO(bytes))
 
                 # format image to fit for training
                 image = format_image(image)
-                logging.info(f"Image type: {type(image)}")
+                #logging.info(f"Image type: {type(image)}")
 
                 # delete blob
                 blob_client.delete_blob()
@@ -105,20 +105,6 @@ def get_all_from_queue(): #-> list[tuple[image, int]]:
 
         logging.info(f"Got {len(new_rows)} images from the queue.")
         return new_rows
-
-def train_model(dataset: str, model_version: int) -> LogisticRegression:
-    """Train a model on the given dataset.
-    """
-    logging.info(f"Training the model on {len(dataset.splitlines())} samples.")
-    df = pd.read_csv(StringIO(dataset), header=None)
-    logging.info(f"Loaded {len(df)} samples from the dataset.")
-    logging.info(f"Last row: {df.iloc[-1]}")
-    X = df.iloc[:, :-1]
-    y = df.iloc[:, -1]
-    model = LogisticRegression()
-    model.fit(X, y)
-
-    return model
 
 def latest_model_version() -> int:
     """
@@ -143,12 +129,12 @@ def load_model(version:int):
         container_client = blob_service_client.get_container_client(os.environ["STORAGE_CONTAINER"])
         blob_client = container_client.get_blob_client(f"models/flowersmodel_{version}.keras") 
         logging.info(f"Loading model version {version}.")
-        logging.info(f"type {type(blob_client)}.")
+        #logging.info(f"type {type(blob_client)}.")
 
         blob_data = blob_client.download_blob()
         file_bytes = blob_data.readall()
-        logging.info(f"Downloaded model size: {len(file_bytes)} bytes.")
-        logging.info(f"type {type(file_bytes)}.")
+        #logging.info(f"Downloaded model size: {len(file_bytes)} bytes.")
+        #logging.info(f"type {type(file_bytes)}.")
         return file_bytes
 
         # https://stackoverflow.com/questions/74693871/why-joblib-is-not-recommended-when-saving-keras-model
@@ -179,6 +165,19 @@ def load_dataset():
 
         return None
 
+def upload_model(model_file, file_path):
+    """
+    Append new model to models.
+    """
+    logging.info(f"Uploading model {file_path} to storage container.")
+    #logging.info(f"model_file: {model_file}")
+    #logging.info(f"file_path: {file_path}")
+    with get_blob_service_client() as blob_service_client:
+        container_client = blob_service_client.get_container_client(os.environ["STORAGE_CONTAINER"])
+        with open(model_file, "rb") as data:
+            blob_client = container_client.get_blob_client(file_path)
+            blob_client.upload_blob(data, overwrite=True)
+            logging.info(f"Upload complete for {model_file}.")
 
 ### UNUSED
 
@@ -207,16 +206,16 @@ def images_to_csv(images: list[tuple[Image.Image, int]]) -> str:
     new_rows = "\n".join(new_rows) + "\n"
     return new_rows
 
-def upload_model(model_file, file_path):
+def train_model(dataset: str, model_version: int) -> LogisticRegression:
+    """Train a model on the given dataset.
     """
-    Append new model to models.
-    """
-    logging.info(f"Uploading model to storage container.")
-    logging.info(f"model_file: {model_file}")
-    logging.info(f"file_path: {file_path}")
-    with get_blob_service_client() as blob_service_client:
-        container_client = blob_service_client.get_container_client(os.environ["STORAGE_CONTAINER"])
-        with open(model_file, "rb") as data:
-            blob_client = container_client.get_blob_client(file_path)
-            blob_client.upload_blob(data, overwrite=True)
-            logging.info(f"Upload complete for {model_file}.")
+    logging.info(f"Training the model on {len(dataset.splitlines())} samples.")
+    df = pd.read_csv(StringIO(dataset), header=None)
+    logging.info(f"Loaded {len(df)} samples from the dataset.")
+    logging.info(f"Last row: {df.iloc[-1]}")
+    X = df.iloc[:, :-1]
+    y = df.iloc[:, -1]
+    model = LogisticRegression()
+    model.fit(X, y)
+
+    return model
