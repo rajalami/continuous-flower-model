@@ -26,7 +26,7 @@ variable "default_tags" {
     Owner       = "KAMK"
     Environment = "student"
     CostCenter  = "1020"
-    Course      = "TT00CC66-3002"
+    Course      = "TT00CC64-3002"
   }
 }
 
