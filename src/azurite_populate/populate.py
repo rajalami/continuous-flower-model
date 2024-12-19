@@ -74,7 +74,8 @@ if __name__ == "__main__":
     # ]
 
     files = [
-        ("models/", "flowersmodel_1234567890.keras")
+        ("models/", "flowersmodel_1234567890.keras"),
+        ("datasets/", "val_data.zip")
     ]
 
     with get_blob_service_client() as blob_service_client:

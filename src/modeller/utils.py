@@ -8,6 +8,8 @@ import json
 import tensorflow as tf
 import keras
 from datetime import datetime
+import pathlib
+import zipfile
 
 from base64 import b64decode
 from io import StringIO, BytesIO
@@ -71,7 +73,8 @@ def get_all_from_queue(): #-> list[tuple[image, int]]:
         new_rows = []
 
         for msg in messages:
-            logging.info(f"msg.content type: {type(msg.content)}")
+            
+            # https://stackoverflow.com/questions/39491420/python-jsonexpecting-property-name-enclosed-in-double-quotes?page=2&tab=scoredesc#tab-top
             message_content = json.loads(msg.content)
             image_name = message_content.get("image_name")
             label = message_content.get("label")
@@ -87,6 +90,8 @@ def get_all_from_queue(): #-> list[tuple[image, int]]:
                 bytes = blob_data.readall()
                 logging.info(f"Bytes length: {len(bytes)}")
                 image = keras.preprocessing.image.load_img(BytesIO(bytes))
+
+                # format image to fit for training
                 image = format_image(image)
                 logging.info(f"Image type: {type(image)}")
 
@@ -155,6 +160,25 @@ def load_model(version:int):
         #     logging.info(f"2")
         #     return joblib.load(data)
 
+def load_dataset():
+    """
+    unzips the data.
+    """
+    logging.info(f"Loading validation dataset.")
+    with get_blob_service_client() as blob_service_client:
+        container_client = blob_service_client.get_container_client(os.environ["STORAGE_CONTAINER"])
+        blob_client = container_client.get_blob_client("datasets/val_data.zip")
+
+        os.makedirs("./val/", exist_ok=True)
+        target_folder = pathlib.Path("./val/")
+        blob_stream = blob_client.download_blob()
+        zip_data = blob_stream.readall()
+
+        with zipfile.ZipFile(BytesIO(zip_data), mode="r") as archive:
+            archive.extractall(target_folder)
+
+        return None
+
 
 ### UNUSED
 
@@ -183,16 +207,16 @@ def images_to_csv(images: list[tuple[Image.Image, int]]) -> str:
     new_rows = "\n".join(new_rows) + "\n"
     return new_rows
 
-def load_dataset(file_path="datasets/dataset.csv") -> str:
-    """Load is as a raw string from the storage container.
+def upload_model(model_file, file_path):
     """
-    logging.info(f"Loading dataset from {file_path}.")
+    Append new model to models.
+    """
+    logging.info(f"Uploading model to storage container.")
+    logging.info(f"model_file: {model_file}")
+    logging.info(f"file_path: {file_path}")
     with get_blob_service_client() as blob_service_client:
         container_client = blob_service_client.get_container_client(os.environ["STORAGE_CONTAINER"])
-        # blob_client = container_client.get_blob_service_client(file_path)
-
-        with container_client.get_blob_client(file_path) as blob_client:
-            blob = blob_client.download_blob()
-            content = blob.content_as_text()
-            logging.info(f"Loaded # samples from {file_path}: {len(content.splitlines())}")
-            return content
+        with open(model_file, "rb") as data:
+            blob_client = container_client.get_blob_client(file_path)
+            blob_client.upload_blob(data, overwrite=True)
+            logging.info(f"Upload complete for {model_file}.")

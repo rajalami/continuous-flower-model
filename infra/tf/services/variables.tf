@@ -43,11 +43,11 @@ variable "backend_image" {
 
 }
 
-# variable "modeller_image" {
-#   type        = string
-#   description = "The image to use for the modeller container (The Scikit Learn Modeller)"
-#   default     = "crmikkoolearn.azurecr.io/modeller:1.0" #  cropeolearn.azurecr.io/modeller:1.0
-# }
+variable "modeller_image" {
+  type        = string
+  description = "The image to use for the modeller container (The Scikit Learn Modeller)"
+  default     = "crmikkoolearn.azurecr.io/modeller:1.0" #  cropeolearn.azurecr.io/modeller:1.0
+}
 
 variable "use_azure_credential" {
   type    = bool
