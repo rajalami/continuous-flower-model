@@ -57,6 +57,20 @@ services:
       populate:
         condition: service_completed_successfully
 
+  modeller:
+    image: kamk/modeller
+    hostname: modeller
+    env_file:
+      - .env
+    build:
+      context: ./src/modeller
+      dockerfile: Dockerfile
+    networks:
+        - olearn
+    depends_on:
+      populate:
+        condition: service_completed_successfully
+
 networks:
   olearn:
     

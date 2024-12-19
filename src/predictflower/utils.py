@@ -77,6 +77,7 @@ def load_model(version:int):
         logging.info(f"Loading model version {version}.")
         logging.info(f"type {type(blob_client)}.")
         
+        # https://stackoverflow.com/questions/74693871/why-joblib-is-not-recommended-when-saving-keras-model
         # with BytesIO() as data:
         #     logging.info(f"1")
         #     logging.info(f"{data}")
