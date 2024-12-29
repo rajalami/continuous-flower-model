@@ -1,15 +1,15 @@
 #!/bin/bash
 # aloittely, ei taida toimia.
-# set -e -> pysähtyy virheeseen
+# set -e = quits if error
 set -e
 
-# Poistetaan palvelut Azuren pilvestä
+# Destroy palvelut Azuren pilvestä
 echo "Closing services"
 cd infra/tf/services
 terraform destroy -auto-approve
-cd ../../..
+cd ../../../ # back to root
 
-# Poista Container Registry Azuresta
+# Destory Container Registry Azuresta
 echo "Closing and deleting container registry"
 cd infra/tf/container_registry
 terraform destroy -auto-approve

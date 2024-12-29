@@ -66,7 +66,8 @@ def predict_hello(image_file:   UploadFile = File(...)) -> Prediction:
     flower_list = ["dandelion", "daisy", "tulips", "sunflowers", "roses"]
     prediction = flower_list[int(output_index)]
     logging.info(f"Prediction: {prediction}")
-
+    
+    # return prediction
     return Prediction(
         label=output_index,
         confidence=confidence,
