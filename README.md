@@ -1,4 +1,4 @@
-Flower prediction model that can be trained with new data continuously. Uses terraform to load 3 containers into Azure. Simple Ui that can be used to load picture and to predict the correct flower category with .keras model. If predicted incorrectly, new model can be trained with same picture, new model will be used in next prediction.
+Flower prediction model that can be trained with new data continuously. Uses terraform to load 3 containers into Azure. Simple UI that can be used to load picture and to predict the correct flower category with .keras model. If predicted incorrectly, new model can be trained with same picture. New model will be used in next prediction.
 
 <!---
 # Kasvimallin käyttöönotto, sekä alasajo Azuressa.
